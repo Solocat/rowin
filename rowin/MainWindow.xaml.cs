@@ -22,42 +22,38 @@ namespace rowin
         [DllImport("user32.dll")]
         internal static extern int SetWindowCompositionAttribute(IntPtr hwnd, ref AcrylicBlur.WindowCompositionAttributeData data);
 
+        internal void EnableBlur(uint opacity, uint color)
+        {
+            var windowHelper = new WindowInteropHelper(this);
+
+            var accent = new AcrylicBlur.AccentPolicy();
+            accent.AccentState = AcrylicBlur.AccentState.ACCENT_ENABLE_ACRYLICBLURBEHIND;
+            accent.GradientColor = (opacity << 24) | (color & 0xFFFFFF); /* BGR color format */
+
+
+            var accentStructSize = Marshal.SizeOf(accent);
+
+            var accentPtr = Marshal.AllocHGlobal(accentStructSize);
+            Marshal.StructureToPtr(accent, accentPtr, false);
+
+            var data = new AcrylicBlur.WindowCompositionAttributeData();
+            data.Attribute = AcrylicBlur.WindowCompositionAttribute.WCA_ACCENT_POLICY;
+            data.SizeOfData = accentStructSize;
+            data.Data = accentPtr;
+
+            SetWindowCompositionAttribute(windowHelper.Handle, ref data);
+
+            Marshal.FreeHGlobal(accentPtr);
+        }
+
         public ObservableCollection<AppItem> AppList { get; set; }
 
         public ICollectionView AppListView { get; private set; }
 
         public ICollectionViewLiveShaping AppListLive { get; set; }
 
-        public IEnumerable<AppItem> VisibleApps { get { return AppList.Where(app => app.Name.Contains(InputText)); } }
         public string InputText { get { return _InputText; } set { _InputText = value; FilterAndSort(value); } }
         private string _InputText { get; set; }
-        /*public void FilterApps(string text)
-        {
-            if (String.IsNullOrEmpty(text))
-            {
-                foreach (var app in AppList)
-                {
-                    app.IsVisible = true;
-                    app.CharsBeforeToken = 0;
-                }
-            }
-            else
-            {
-                foreach (var app in AppList)
-                {
-                    app.IsVisible = false;
-                }
-
-                var filtered = AppList.Where(app => app.GiveOrder(text) >= 0);
-                foreach (var app in filtered)
-                {
-                    app.IsVisible = true;
-                }
-                //List<AppItem> sorted = filtered.OrderBy(app => app.CharsBeforeToken).ToList();
-            }
-
-            AppListView.Refresh();
-        }*/
 
         public void FilterAndSort(string text)
         {
@@ -101,29 +97,7 @@ namespace rowin
             EnableBlur(0x64, 0);
         }
 
-        internal void EnableBlur(uint opacity, uint color)
-        {
-            var windowHelper = new WindowInteropHelper(this);
-
-            var accent = new AcrylicBlur.AccentPolicy();
-            accent.AccentState = AcrylicBlur.AccentState.ACCENT_ENABLE_ACRYLICBLURBEHIND;
-            accent.GradientColor = (opacity << 24) | (color & 0xFFFFFF); /* BGR color format */
-
-
-            var accentStructSize = Marshal.SizeOf(accent);
-
-            var accentPtr = Marshal.AllocHGlobal(accentStructSize);
-            Marshal.StructureToPtr(accent, accentPtr, false);
-
-            var data = new AcrylicBlur.WindowCompositionAttributeData();
-            data.Attribute = AcrylicBlur.WindowCompositionAttribute.WCA_ACCENT_POLICY;
-            data.SizeOfData = accentStructSize;
-            data.Data = accentPtr;
-
-            SetWindowCompositionAttribute(windowHelper.Handle, ref data);
-
-            Marshal.FreeHGlobal(accentPtr);
-        }
+       
 
         private void StartSelected()
         {

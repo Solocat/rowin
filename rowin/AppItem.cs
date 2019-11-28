@@ -12,7 +12,7 @@ using System.Windows.Media.Imaging;
 
 namespace rowin
 {
-    public class AppItem : INotifyPropertyChanged
+    public class AppItem
     {
         private BitmapSource ExtractIconFromFile(string file)
         {
@@ -35,9 +35,6 @@ namespace rowin
         }
         private BitmapSource _Icon { get; set; }
 
-        //public bool IsVisible { get { return _IsVisible; } set { _IsVisible = value; OnPropertyChanged("IsVisible"); } }
-        //private bool _IsVisible { get; set; }
-
         public bool IsVisible { get { return CharsBeforeToken != -1; } }
 
         public int GiveOrder(string text)
@@ -46,20 +43,8 @@ namespace rowin
 
             CharsBeforeToken = Name.IndexOf(text, StringComparison.OrdinalIgnoreCase);
 
-            //TextBeforeToken = CharsBeforeToken > 0 ? Name.Substring(0, CharsBeforeToken) : String.Empty;
-            //TextAfterToken = Name.Substring(CharsBeforeToken + text.Length);
-
             return CharsBeforeToken;
         }
         public int CharsBeforeToken { get; set; }
-
-        public string TextBeforeToken { get; set; }
-        public string TextAfterToken { get; set; }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        private void OnPropertyChanged(string property)
-        {
-            PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(property));
-        }
     }
 }
