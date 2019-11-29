@@ -1,5 +1,4 @@
 focus two elements at the same time
 run in background
-let content scroll
 
 live shaping?

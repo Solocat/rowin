@@ -15,10 +15,13 @@
     <Grid>
         <Border BorderThickness="0" Background="#01000000" /> <!--Scrim to prevent interacting with background. must have some opacity-->
 
-        <StackPanel Height="480" Width="800">
-            <TextBox Name="InputBox" Padding="0" Text="{Binding Path=InputText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Background="Transparent" BorderThickness="0" Foreground="White" CaretBrush="White" FontSize="32"/>
+        <StackPanel  Width="800" VerticalAlignment="Center">
+            <TextBox Name="InputBox" Text="{Binding Path=InputText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                     Background="Transparent" BorderThickness="0" Foreground="White" CaretBrush="White" FontSize="32"/>
 
-            <ListBox Name="AppContainer" ItemsSource="{Binding AppListLive}" BorderThickness="0" Background="Transparent" MouseDoubleClick="AppContainer_MouseDoubleClick" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.CanContentScroll="True" Padding="-1" MouseMove="AppContainer_MouseMove">
+            <ListBox Name="AppContainer" ItemsSource="{Binding AppListLive}" Height="512" BorderThickness="0" Background="Transparent" Padding="-1"
+                     MouseDoubleClick="AppContainer_MouseDoubleClick" 
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Hidden" ScrollViewer.CanContentScroll="True">
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
                         <WrapPanel />
@@ -26,9 +29,9 @@
                 </ListBox.ItemsPanel>
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <DockPanel HorizontalAlignment="Stretch" Margin="12 0">
+                        <DockPanel Margin="12 0">
                             <Image Source="{Binding Icon}" Stretch="None" DockPanel.Dock="Left" Margin="0 0 12 0"/>
-                            <TextBlock Foreground="White" FontSize="18" TextWrapping="Wrap" VerticalAlignment="Center">
+                            <TextBlock Foreground="White" FontSize="18" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" VerticalAlignment="Center">
                                 <TextBlock.Inlines>
                                     <Run Text="{Binding Path=TextBeforeToken, Mode=OneWay}" /><!--
                                  --><Run FontWeight="Bold" Text="{Binding Token}" /><!--
