@@ -6,7 +6,7 @@
         xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
         xmlns:local="clr-namespace:rowin"
         mc:Ignorable="d"
-        Title="MainWindow" WindowStyle="None" WindowState="Maximized" AllowsTransparency="True" Background="Transparent" Loaded="Window_Loaded" KeyDown="Window_KeyDown" KeyUp="Window_KeyUp">
+        Title="MainWindow" WindowStyle="None"  AllowsTransparency="True" Background="Transparent" Loaded="Window_Loaded" KeyDown="Window_KeyDown" KeyUp="Window_KeyUp">
 
     <Window.Resources>
 
@@ -15,10 +15,10 @@
     <Grid>
         <Border BorderThickness="0" Background="#01000000" /> <!--Scrim to prevent interacting with background. must have some opacity-->
 
-        <StackPanel Height="480" Width="802">
-            <TextBox Name="InputBox" Padding="4" Text="{Binding Path=InputText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Background="Transparent" BorderThickness="0" Foreground="White" CaretBrush="White" FontSize="32"/>
+        <StackPanel Height="480" Width="800">
+            <TextBox Name="InputBox" Padding="0" Text="{Binding Path=InputText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Background="Transparent" BorderThickness="0" Foreground="White" CaretBrush="White" FontSize="32"/>
 
-            <ListBox Name="AppContainer" ItemsSource="{Binding AppListView}" BorderThickness="0" Background="Transparent" MouseDoubleClick="AppContainer_MouseDoubleClick" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Margin="0" MouseMove="AppContainer_MouseMove">
+            <ListBox Name="AppContainer" ItemsSource="{Binding AppListLive}" BorderThickness="0" Background="Transparent" MouseDoubleClick="AppContainer_MouseDoubleClick" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.CanContentScroll="True" Padding="-1" MouseMove="AppContainer_MouseMove">
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
                         <WrapPanel />
@@ -26,29 +26,37 @@
                 </ListBox.ItemsPanel>
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" Margin="12 12">
-                            <Image Source="{Binding Icon}" Stretch="None" Margin="0 0 12 0"/>
-                            <TextBlock Text="{Binding Name}" Foreground="White" FontSize="18" TextWrapping="Wrap"/>
-                        </StackPanel>
+                        <DockPanel HorizontalAlignment="Stretch" Margin="12 0">
+                            <Image Source="{Binding Icon}" Stretch="None" DockPanel.Dock="Left" Margin="0 0 12 0"/>
+                            <TextBlock Foreground="White" FontSize="18" TextWrapping="Wrap" VerticalAlignment="Center">
+                                <TextBlock.Inlines>
+                                    <Run Text="{Binding Path=TextBeforeToken, Mode=OneWay}" /><!--
+                                 --><Run FontWeight="Bold" Text="{Binding Token}" /><!--
+                                 --><Run Text="{Binding TextAfterToken}"/>
+                                </TextBlock.Inlines>
+                            </TextBlock>
+                        </DockPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="ListBoxItem">
                         <Setter Property="Width" Value="200"/>
-
+                        <Setter Property="Height" Value="64" />
+                        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
                         <Setter Property="Template">
                             <Setter.Value>
                                 <ControlTemplate TargetType="ListBoxItem">
-                                    <Border Name="_Border" BorderThickness="2" CornerRadius="5" Padding="0" Background="Transparent">
+                                    <Border Name="_Border" BorderThickness="2" CornerRadius="5" Background="Transparent">
                                         <ContentPresenter />
                                     </Border>
                                     <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="true">
+                                            <Setter TargetName="_Border" Property="Background" Value="#77000000"/>
+                                            <Setter TargetName="_Border" Property="BorderBrush" Value="#77000000"/>
+                                        </Trigger>
                                         <Trigger Property="IsSelected" Value="true">
                                             <Setter TargetName="_Border" Property="Background" Value="#77000000"/>
                                             <Setter TargetName="_Border" Property="BorderBrush" Value="#77FFFFFF"/>
-                                        </Trigger>
-                                        <Trigger Property="IsMouseOver" Value="true">
-                                            <Setter TargetName="_Border" Property="Background" Value="#77000000"/>
                                         </Trigger>
                                     </ControlTemplate.Triggers>
                                 </ControlTemplate>
@@ -56,6 +64,11 @@
                         </Setter>
                     </Style>
                 </ListBox.ItemContainerStyle>
+                <ListBox.Style>
+                    <Style>
+                        
+                    </Style>
+                </ListBox.Style>
             </ListBox>
         </StackPanel>
     </Grid>

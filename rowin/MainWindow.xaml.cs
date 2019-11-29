@@ -61,7 +61,7 @@ namespace rowin
             {
                 app.GiveOrder(text);
             }
-            AppListView.Refresh();
+            //AppListView.Refresh();
         }
 
         public MainWindow()
@@ -74,12 +74,21 @@ namespace rowin
             AppListView.SortDescriptions.Add(
                 new SortDescription("Name", ListSortDirection.Ascending));
 
-            AppListLive = AppList as ICollectionViewLiveShaping;
+            AppListLive = AppListView as ICollectionViewLiveShaping;
+            AppListLive.LiveFilteringProperties.Add("IsVisible");
+            AppListLive.IsLiveFiltering = true;
+
+            AppListLive.LiveSortingProperties.Add("CharsBeforeToken");
+            AppListLive.LiveSortingProperties.Add("Name");
+            AppListLive.IsLiveSorting = true;
 
             DataContext = this;
             InitializeComponent();
-            
-            foreach (var file in Directory.GetFiles(@"C:\Users\olli.myllymaki\Desktop"))
+
+            var files = Directory.GetFiles(@Environment.GetFolderPath(Environment.SpecialFolder.Desktop)).ToList<string>();
+            files.AddRange(Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.CommonDesktopDirectory)));
+            files.AddRange(Directory.GetFiles(@"C:\Users\olli.myllymaki\Documents"));
+            foreach (var file in files)
             {
                 if (Path.GetFileNameWithoutExtension(file) == "desktop") continue;
                 AppList.Add(new AppItem()
@@ -87,7 +96,7 @@ namespace rowin
                     FilePath = file,
                 });
             }
-
+            InputText = String.Empty; //force filter
 
             InputBox.Focus();
         }
@@ -105,6 +114,7 @@ namespace rowin
             {
                 Process.Start((AppContainer.SelectedItem as AppItem).FilePath);
                 Application.Current.Shutdown();
+                //this.Hide();
             }
         }
 
