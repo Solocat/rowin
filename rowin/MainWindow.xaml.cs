@@ -85,12 +85,13 @@ namespace rowin
             DataContext = this;
             InitializeComponent();
 
-            var files = Directory.GetFiles(@Environment.GetFolderPath(Environment.SpecialFolder.Desktop)).ToList<string>();
+            var files = Directory.GetFiles(@Environment.GetFolderPath(Environment.SpecialFolder.Desktop)).ToList();
             files.AddRange(Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.CommonDesktopDirectory)));
             files.AddRange(Directory.GetFiles(@"C:\Users\olli.myllymaki\Documents"));
             foreach (var file in files)
             {
-                if (Path.GetFileNameWithoutExtension(file) == "desktop") continue;
+                string name = Path.GetFileNameWithoutExtension(file);
+                if (name == "desktop" || String.IsNullOrEmpty(name)) continue;
                 AppList.Add(new AppItem()
                 {
                     FilePath = file,
