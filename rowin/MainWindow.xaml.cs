@@ -122,36 +122,19 @@ namespace rowin
             }
         }
 
-        private void FocusApps(System.Windows.Input.Key key)
+        private void FocusApps()
         {
             if (InputBox.IsFocused && AppContainer.Items.Count > 0)
             {
-                if (AppContainer.SelectedIndex == -1 && key != System.Windows.Input.Key.Up) //no selection
+                if (AppContainer.SelectedItem == null)
                 {
-                    AppContainer.SelectedIndex = 0;
+                    AppContainer.Focus();
                 }
-                else 
+                else
                 {
-                    switch (key) //force move selection
-                    {
-                        case System.Windows.Input.Key.Down:
-                            if (AppContainer.SelectedIndex + 4 < AppContainer.Items.Count) AppContainer.SelectedIndex += 4;
-                            break;
-                        case System.Windows.Input.Key.Up:
-                            if (AppContainer.SelectedIndex >= 4) AppContainer.SelectedIndex -= 4;
-                            break;
-                        case System.Windows.Input.Key.Left:
-                            if (AppContainer.SelectedIndex % 4 != 0) AppContainer.SelectedIndex--;
-                            break;
-                        case System.Windows.Input.Key.Right:
-                            if (AppContainer.SelectedIndex % 4 != 3 && AppContainer.SelectedIndex + 1 < AppContainer.Items.Count) AppContainer.SelectedIndex++;
-                            break;
-                        default: break;
-                    }
+                    var listBoxItem = (ListBoxItem)AppContainer.ItemContainerGenerator.ContainerFromItem(AppContainer.SelectedItem);
+                    listBoxItem.Focus();
                 }
-
-                var listBoxItem = (ListBoxItem)AppContainer.ItemContainerGenerator.ContainerFromItem(AppContainer.SelectedItem);
-                listBoxItem.Focus();
             }
         }
 
@@ -161,47 +144,36 @@ namespace rowin
             InputBox.Focus();
         }
 
-        private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-            switch (e.Key)
-            {
-                case System.Windows.Input.Key.Down: break;
-                case System.Windows.Input.Key.Up: break;
-                case System.Windows.Input.Key.Left: break;
-                case System.Windows.Input.Key.Right: break;
-                case System.Windows.Input.Key.Enter: StartSelected(); break;
-                case System.Windows.Input.Key.Escape: Application.Current.Shutdown(); break;
-                default: FocusText(e.Key); break;
-            }
-            //e.Handled = true;
-        }
-
-        
-
-        private void Window_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-            switch (e.Key)
-            {
-                //case System.Windows.Input.Key.Enter: StartSelected(); break;
-                //case System.Windows.Input.Key.Escape: Application.Current.Shutdown(); break;
-                case System.Windows.Input.Key.Down: FocusApps(e.Key); break;
-                case System.Windows.Input.Key.Up: FocusApps(e.Key); break;
-                case System.Windows.Input.Key.Left: FocusApps(e.Key); break;
-                case System.Windows.Input.Key.Right: FocusApps(e.Key); break;
-                default: break;
-            }
-            e.Handled = true;
-        }
-
         private void AppContainer_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             StartSelected();
         }
 
-        private void AppContainer_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+        private void Window_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            System.Windows.Point pt = e.GetPosition(this);
-            System.Windows.Media.VisualTreeHelper.HitTest(this, pt);
+            switch (e.Key)
+            {
+                case System.Windows.Input.Key.Enter: StartSelected(); e.Handled = true; break;
+                case System.Windows.Input.Key.Escape: Application.Current.Shutdown(); break;
+                case System.Windows.Input.Key.Down: FocusApps(); break;
+                case System.Windows.Input.Key.Up: FocusApps(); break;
+                case System.Windows.Input.Key.Left: FocusApps(); break;
+                case System.Windows.Input.Key.Right: FocusApps(); break;
+                default: InputBox.Focus(); break;
+            }
+        }
+
+        private void InputBox_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
+        {
+            // Prohibit non-alphabetic
+
+            /*Regex r = new Regex(@"^[a-zA-Z]+$");
+
+            return r.IsMatch(s);
+
+            if (!IsAlphabetic(e.Text))
+                e.Handled = true;*/
+            Trace.WriteLine("input");
         }
     }
 }

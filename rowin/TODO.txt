@@ -1,10 +1,9 @@
-focus two elements at the same time
 run in background
 right click to do things?
 
 ".vsconfig" on hankala
-Deep Rock
-divide name into words by spaces,dashes, capitals etc.
+Deep Rock: divide name into words by spaces,dashes, capitals etc.
+verylongwords aren't centered
 
 live shaping?
-
+focus two elements at the same time?

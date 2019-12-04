@@ -124,7 +124,7 @@ namespace rowin
 
             foreach (var f in TextFragments)
             {
-                Trace.WriteLine(f);
+                //Trace.WriteLine(f);
             }
 
             OnPropertyChanged("TextBeforeToken");
