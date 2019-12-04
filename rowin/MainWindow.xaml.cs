@@ -91,7 +91,10 @@ namespace rowin
             foreach (var file in files)
             {
                 string name = Path.GetFileNameWithoutExtension(file);
-                if (name == "desktop" || String.IsNullOrEmpty(name)) continue;
+                if (File.GetAttributes(file).HasFlag(FileAttributes.Hidden) || String.IsNullOrEmpty(name))
+                {
+                    continue;
+                }
                 AppList.Add(new AppItem()
                 {
                     FilePath = file,
@@ -166,7 +169,7 @@ namespace rowin
                 case System.Windows.Input.Key.Up: break;
                 case System.Windows.Input.Key.Left: break;
                 case System.Windows.Input.Key.Right: break;
-                case System.Windows.Input.Key.Enter: break;
+                case System.Windows.Input.Key.Enter: StartSelected(); break;
                 case System.Windows.Input.Key.Escape: Application.Current.Shutdown(); break;
                 default: FocusText(e.Key); break;
             }
@@ -187,7 +190,7 @@ namespace rowin
                 case System.Windows.Input.Key.Right: FocusApps(e.Key); break;
                 default: break;
             }
-            //e.Handled = true;
+            e.Handled = true;
         }
 
         private void AppContainer_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)

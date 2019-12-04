@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 
@@ -56,6 +58,8 @@ namespace rowin
         public List<string> TextFragments { get; set; }
 
         public List<bool> BoldCharacters { get; set; }
+
+        public TextBlock Text { get; set; }
 
         public BitmapSource Icon { get {
                 if (_Icon == null) _Icon = ExtractIconFromFile(FilePath);
@@ -110,6 +114,11 @@ namespace rowin
                     TextFragments.Add(Name.Substring(0, CharsBeforeToken));
                     TextFragments.Add(Name.Substring(CharsBeforeToken, text.Length));
                     TextFragments.Add(Name.Substring(CharsBeforeToken + text.Length));
+
+                    Text = new TextBlock();
+                    Text.Inlines.Add(new Run(Name.Substring(0, CharsBeforeToken)));
+                    Text.Inlines.Add(new Bold(new Run(Name.Substring(CharsBeforeToken, text.Length))));
+                    Text.Inlines.Add(new Run(Name.Substring(CharsBeforeToken + text.Length)));
                 }
             }
 
@@ -124,7 +133,7 @@ namespace rowin
 
             return CharsBeforeToken;
         }
-        public int CharsBeforeToken { get { return _CharsBeforeToken; } set { _CharsBeforeToken = value; OnPropertyChanged("CharsBeforeToken"); OnPropertyChanged("IsVisible"); } }
+        public int CharsBeforeToken { get { return _CharsBeforeToken; } set { _CharsBeforeToken = value; OnPropertyChanged("IsVisible"); } }
 
         private int _CharsBeforeToken { get; set; }
 
@@ -138,8 +147,7 @@ namespace rowin
 
         private void OnPropertyChanged(string property)
         {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(property));
+            PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(property));
         }
     }
 }
