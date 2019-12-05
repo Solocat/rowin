@@ -1,9 +1,10 @@
-run in background
+run on system startup
 right click to do things?
 
-".vsconfig" on hankala
 Deep Rock: divide name into words by spaces,dashes, capitals etc.
 verylongwords aren't centered
+notifyicon doesn't go
 
 live shaping?
 focus two elements at the same time?
+".vsconfig" on hankala

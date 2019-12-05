@@ -22,6 +22,45 @@ namespace rowin
         [DllImport("user32.dll")]
         internal static extern int SetWindowCompositionAttribute(IntPtr hwnd, ref AcrylicBlur.WindowCompositionAttributeData data);
 
+        [DllImport("User32.dll")]
+        private static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
+
+        [DllImport("User32.dll")]
+        private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
+
+        private HwndSource _source;
+        private const int HOTKEY_ID = 9001;
+
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            base.OnSourceInitialized(e);
+            var helper = new WindowInteropHelper(this);
+            _source = HwndSource.FromHwnd(helper.Handle);
+            _source.AddHook(HwndHook);
+            RegisterHotKey(helper.Handle, HOTKEY_ID, 0x001, 0x20);
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            TrayIcon.Icon.Dispose();
+            TrayIcon.Dispose();
+
+            _source.RemoveHook(HwndHook);
+            _source = null;
+            UnregisterHotKey(new WindowInteropHelper(this).Handle, HOTKEY_ID);
+            base.OnClosed(e);
+        }
+
+        private IntPtr HwndHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            if (msg == 0x0312 && wParam.ToInt32() == HOTKEY_ID)
+            {
+                FromTray();
+                handled = true;
+            }
+            return IntPtr.Zero;
+        }
+
         internal void EnableBlur(uint opacity, uint color)
         {
             var windowHelper = new WindowInteropHelper(this);
@@ -46,6 +85,11 @@ namespace rowin
             Marshal.FreeHGlobal(accentPtr);
         }
 
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            EnableBlur(0x64, 0);
+        }
+
         public ObservableCollection<AppItem> AppList { get; set; }
 
         public ICollectionView AppListView { get; private set; }
@@ -55,14 +99,7 @@ namespace rowin
         public string InputText { get { return _InputText; } set { _InputText = value; FilterAndSort(value); } }
         private string _InputText { get; set; }
 
-        public void FilterAndSort(string text)
-        {
-            foreach (var app in AppList)
-            {
-                app.GiveOrder(text);
-            }
-            //AppListView.Refresh();
-        }
+        private System.Windows.Forms.NotifyIcon TrayIcon { get; set; }
 
         public MainWindow()
         {
@@ -85,6 +122,17 @@ namespace rowin
             DataContext = this;
             InitializeComponent();
 
+            var menu = new System.Windows.Forms.ContextMenu();
+            menu.MenuItems.Add("Close", (s, e) => this.Close());
+            TrayIcon = new System.Windows.Forms.NotifyIcon
+            {
+                Icon = new System.Drawing.Icon("rowin.ico"),
+                Visible = true,
+                Text = "Rowin",
+                ContextMenu = menu
+            };
+            TrayIcon.Click += delegate (object sender, EventArgs args) { FromTray(); };
+
             var files = Directory.GetFiles(@Environment.GetFolderPath(Environment.SpecialFolder.Desktop)).ToList();
             files.AddRange(Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.CommonDesktopDirectory)));
             files.AddRange(Directory.GetFiles(@"C:\Users\olli.myllymaki\Documents"));
@@ -101,25 +149,28 @@ namespace rowin
                 });
             }
             InputText = String.Empty; //force filter
-
             InputBox.Focus();
-
-            System.Windows.Forms.NotifyIcon ni = new System.Windows.Forms.NotifyIcon
-            {
-                Icon = new System.Drawing.Icon("Icon.ico"),
-                Visible = true
-            };
-            ni.Click += delegate (object sender, EventArgs args)
-            {
-                this.Show();
-                //this.WindowState = WindowState.Normal;
-            };
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        public void FilterAndSort(string text)
         {
-            EnableBlur(0x64, 0);
+            foreach (var app in AppList)
+            {
+                app.GiveOrder(text);
+            }
+            //AppListView.Refresh();
         }
+
+        public void FromTray()
+        {
+            InputText = String.Empty;
+            InputBox.Text = string.Empty;
+            InputBox.Focus();
+            AppContainer.SelectedIndex = -1;
+
+            this.Show();
+        }
+
 
         private void ToTray()
         {
@@ -154,7 +205,6 @@ namespace rowin
 
         private void FocusText(System.Windows.Input.Key key)
         {
-            //if (AppContainer.SelectedIndex < 4) //top row
             InputBox.Focus();
         }
 
@@ -187,7 +237,7 @@ namespace rowin
 
             if (!IsAlphabetic(e.Text))
                 e.Handled = true;*/
-            Trace.WriteLine("input");
+            //Trace.WriteLine("input");
         }
     }
 }
