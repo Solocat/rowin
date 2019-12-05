@@ -103,6 +103,17 @@ namespace rowin
             InputText = String.Empty; //force filter
 
             InputBox.Focus();
+
+            System.Windows.Forms.NotifyIcon ni = new System.Windows.Forms.NotifyIcon
+            {
+                Icon = new System.Drawing.Icon("Icon.ico"),
+                Visible = true
+            };
+            ni.Click += delegate (object sender, EventArgs args)
+            {
+                this.Show();
+                //this.WindowState = WindowState.Normal;
+            };
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -110,15 +121,18 @@ namespace rowin
             EnableBlur(0x64, 0);
         }
 
-       
+        private void ToTray()
+        {
+            this.Hide();
+        }
 
         private void StartSelected()
         {
             if (AppContainer.SelectedItem != null)
             {
                 Process.Start((AppContainer.SelectedItem as AppItem).FilePath);
-                Application.Current.Shutdown();
-                //this.Hide();
+                //Application.Current.Shutdown();
+                ToTray();
             }
         }
 
@@ -154,7 +168,7 @@ namespace rowin
             switch (e.Key)
             {
                 case System.Windows.Input.Key.Enter: StartSelected(); e.Handled = true; break;
-                case System.Windows.Input.Key.Escape: Application.Current.Shutdown(); break;
+                case System.Windows.Input.Key.Escape: ToTray(); break;
                 case System.Windows.Input.Key.Down: FocusApps(); break;
                 case System.Windows.Input.Key.Up: FocusApps(); break;
                 case System.Windows.Input.Key.Left: FocusApps(); break;
