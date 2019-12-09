@@ -32,17 +32,6 @@ namespace rowin
         private HwndSource _source;
         private const int HOTKEY_ID = 9001;
 
-        protected override void OnClosed(EventArgs e)
-        {
-            TrayIcon.Icon.Dispose();
-            TrayIcon.Dispose();
-
-            _source.RemoveHook(HwndHook);
-            _source = null;
-            UnregisterHotKey(new WindowInteropHelper(this).Handle, HOTKEY_ID);
-            base.OnClosed(e);
-        }
-
         private IntPtr HwndHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
             if (msg == 0x0312 && wParam.ToInt32() == HOTKEY_ID)
@@ -121,9 +110,10 @@ namespace rowin
                 Text = "Rowin",
                 ContextMenu = menu
             };
-            TrayIcon.Click += delegate (object sender, EventArgs args) { FromTray(); };
+            TrayIcon.DoubleClick += delegate (object sender, EventArgs args) { FromTray(); };
 
-            GetFiles(ConfigurationManager.AppSettings["customFolder"]);
+            //GetFiles(ConfigurationManager.AppSettings["customFolder"]);
+            GetFiles(Properties.Settings.Default.customFolder);
 
             //hook hotkey
             var handle = new WindowInteropHelper(this).EnsureHandle();
@@ -164,11 +154,8 @@ namespace rowin
             {
                 GetFiles(dialog.SelectedPath);
 
-                Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-
-                config.AppSettings.Settings["customFolder"].Value = dialog.SelectedPath;
-                config.Save(ConfigurationSaveMode.Modified);
-                ConfigurationManager.RefreshSection(config.AppSettings.SectionInformation.Name);
+                Properties.Settings.Default.customFolder = dialog.SelectedPath;
+                Properties.Settings.Default.Save();
             }
         }
 
@@ -258,6 +245,51 @@ namespace rowin
             if (!IsAlphabetic(e.Text))
                 e.Handled = true;*/
             //Trace.WriteLine("input");
+        }
+
+        private void AdminStart_Click(object sender, RoutedEventArgs e)
+        {
+            if (AppContainer.SelectedItem != null)
+            {
+
+                var info = new ProcessStartInfo
+                {
+                    FileName = (AppContainer.SelectedItem as AppItem).FilePath,
+                    UseShellExecute = true,
+                    Verb = "runas"
+                };
+
+                if (info.Verbs.Contains("runas"))
+                {
+                    Process.Start(info);
+                    ToTray();
+
+                }
+                else StartSelected();
+            }
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            //Window is loaded and then hidden, to make first render instant. Window is moved offscreen to prevent flashing.
+
+            this.Height = SystemParameters.PrimaryScreenHeight * 0.67;
+            this.Width = SystemParameters.PrimaryScreenWidth * 0.67;
+            this.Left = (SystemParameters.PrimaryScreenWidth / 2) - (this.Width / 2);
+            this.Top = (SystemParameters.PrimaryScreenHeight / 2) - (this.Height / 2);
+
+            this.Hide();
+
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            TrayIcon.Icon.Dispose();
+            TrayIcon.Dispose();
+
+            _source.RemoveHook(HwndHook);
+            _source = null;
+            UnregisterHotKey(new WindowInteropHelper(this).Handle, HOTKEY_ID);
         }
     }
 }

@@ -6,7 +6,7 @@
         xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
         xmlns:local="clr-namespace:rowin"
         mc:Ignorable="d"
-        Title="MainWindow" WindowStyle="None" WindowStartupLocation="CenterScreen" AllowsTransparency="True" Background="Transparent" PreviewKeyDown="Window_PreviewKeyDown" Visibility="Hidden">
+        Title="MainWindow" WindowStyle="None" WindowStartupLocation="Manual" Width="0" Height="0" Left="4000" Top="4000" ShowInTaskbar="False" Topmost="True" AllowsTransparency="True" Background="Transparent" PreviewKeyDown="Window_PreviewKeyDown" Loaded="Window_Loaded" Closed="Window_Closed" >
 
     <Window.Resources>
         <Style TargetType="TextBox">
@@ -76,6 +76,12 @@
                                  --><Run Text="{Binding TextAfterToken}"/>
                                 </TextBlock.Inlines>
                             </TextBlock>
+
+                            <DockPanel.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Name="AdminStart" Header="Start as Admin" Click="AdminStart_Click"/>
+                                </ContextMenu>
+                            </DockPanel.ContextMenu>
                         </DockPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
