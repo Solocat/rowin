@@ -1,10 +1,38 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Windows.Interop;
 
 namespace rowin
 {
-    public class AcrylicBlur
+    public static class AcrylicBlur
     {
+        [DllImport("user32.dll")]
+        internal static extern int SetWindowCompositionAttribute(IntPtr hwnd, ref WindowCompositionAttributeData data);
+
+        public static void EnableBlur(uint opacity, uint color, IntPtr handle)
+        {
+            var accent = new AccentPolicy
+            {
+                AccentState = AccentState.ACCENT_ENABLE_ACRYLICBLURBEHIND,
+                GradientColor = (opacity << 24) | (color & 0xFFFFFF) /* BGR color format */
+            };
+
+            var accentStructSize = Marshal.SizeOf(accent);
+
+            var accentPtr = Marshal.AllocHGlobal(accentStructSize);
+            Marshal.StructureToPtr(accent, accentPtr, false);
+
+            var data = new WindowCompositionAttributeData();
+            data.Attribute = WindowCompositionAttribute.WCA_ACCENT_POLICY;
+            data.SizeOfData = accentStructSize;
+            data.Data = accentPtr;
+
+            SetWindowCompositionAttribute(handle, ref data);
+
+            Marshal.FreeHGlobal(accentPtr);
+        }
+
+
         internal enum AccentState
         {
             ACCENT_DISABLED = 0,

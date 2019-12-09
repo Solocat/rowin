@@ -20,9 +20,7 @@ namespace rowin
     /// </summary>
     public partial class MainWindow : Window
     {
-        [DllImport("user32.dll")]
-        internal static extern int SetWindowCompositionAttribute(IntPtr hwnd, ref AcrylicBlur.WindowCompositionAttributeData data);
-
+        
         [DllImport("User32.dll")]
         private static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
 
@@ -41,30 +39,6 @@ namespace rowin
                 handled = true;
             }
             return IntPtr.Zero;
-        }
-
-        internal void EnableBlur(uint opacity, uint color)
-        {
-            var windowHelper = new WindowInteropHelper(this);
-
-            var accent = new AcrylicBlur.AccentPolicy();
-            accent.AccentState = AcrylicBlur.AccentState.ACCENT_ENABLE_ACRYLICBLURBEHIND;
-            accent.GradientColor = (opacity << 24) | (color & 0xFFFFFF); /* BGR color format */
-
-
-            var accentStructSize = Marshal.SizeOf(accent);
-
-            var accentPtr = Marshal.AllocHGlobal(accentStructSize);
-            Marshal.StructureToPtr(accent, accentPtr, false);
-
-            var data = new AcrylicBlur.WindowCompositionAttributeData();
-            data.Attribute = AcrylicBlur.WindowCompositionAttribute.WCA_ACCENT_POLICY;
-            data.SizeOfData = accentStructSize;
-            data.Data = accentPtr;
-
-            SetWindowCompositionAttribute(windowHelper.Handle, ref data);
-
-            Marshal.FreeHGlobal(accentPtr);
         }
 
         public ObservableCollection<AppItem> AppList { get; set; }
@@ -121,7 +95,7 @@ namespace rowin
             _source.AddHook(HwndHook);
             RegisterHotKey(handle, HOTKEY_ID, 0x001, 0x20);
 
-            EnableBlur(0x64, 0);
+            AcrylicBlur.EnableBlur(0x64, 0, handle);
         }
 
         private void GetFiles(string path)
