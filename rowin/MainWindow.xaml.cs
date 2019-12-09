@@ -11,6 +11,7 @@ using System.Linq;
 using System.ComponentModel;
 using System.Windows.Data;
 using System.Windows.Controls;
+using System.Configuration;
 
 namespace rowin
 {
@@ -31,15 +32,6 @@ namespace rowin
         private HwndSource _source;
         private const int HOTKEY_ID = 9001;
 
-        protected override void OnSourceInitialized(EventArgs e)
-        {
-            base.OnSourceInitialized(e);
-            var helper = new WindowInteropHelper(this);
-            _source = HwndSource.FromHwnd(helper.Handle);
-            _source.AddHook(HwndHook);
-            RegisterHotKey(helper.Handle, HOTKEY_ID, 0x001, 0x20);
-        }
-
         protected override void OnClosed(EventArgs e)
         {
             TrayIcon.Icon.Dispose();
@@ -55,7 +47,8 @@ namespace rowin
         {
             if (msg == 0x0312 && wParam.ToInt32() == HOTKEY_ID)
             {
-                FromTray();
+                if (this.Visibility == Visibility.Visible) ToTray();
+                else FromTray();
                 handled = true;
             }
             return IntPtr.Zero;
@@ -83,11 +76,6 @@ namespace rowin
             SetWindowCompositionAttribute(windowHelper.Handle, ref data);
 
             Marshal.FreeHGlobal(accentPtr);
-        }
-
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            EnableBlur(0x64, 0);
         }
 
         public ObservableCollection<AppItem> AppList { get; set; }
@@ -122,8 +110,10 @@ namespace rowin
             DataContext = this;
             InitializeComponent();
 
+            //make tray icon
             var menu = new System.Windows.Forms.ContextMenu();
             menu.MenuItems.Add("Close", (s, e) => this.Close());
+            menu.MenuItems.Add("Set custom folder", SetCustomFolder);
             TrayIcon = new System.Windows.Forms.NotifyIcon
             {
                 Icon = new System.Drawing.Icon("rowin.ico"),
@@ -133,9 +123,24 @@ namespace rowin
             };
             TrayIcon.Click += delegate (object sender, EventArgs args) { FromTray(); };
 
+            GetFiles(ConfigurationManager.AppSettings["customFolder"]);
+
+            //hook hotkey
+            var handle = new WindowInteropHelper(this).EnsureHandle();
+            _source = HwndSource.FromHwnd(handle);
+            _source.AddHook(HwndHook);
+            RegisterHotKey(handle, HOTKEY_ID, 0x001, 0x20);
+
+            EnableBlur(0x64, 0);
+        }
+
+        private void GetFiles(string path)
+        {
+            AppList.Clear();
+
             var files = Directory.GetFiles(@Environment.GetFolderPath(Environment.SpecialFolder.Desktop)).ToList();
             files.AddRange(Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.CommonDesktopDirectory)));
-            files.AddRange(Directory.GetFiles(@"C:\Users\olli.myllymaki\Documents"));
+            if (!String.IsNullOrEmpty(path)) files.AddRange(Directory.GetFiles(path));
             foreach (var file in files)
             {
                 string name = Path.GetFileNameWithoutExtension(file);
@@ -150,6 +155,21 @@ namespace rowin
             }
             InputText = String.Empty; //force filter
             InputBox.Focus();
+        }
+
+        private void SetCustomFolder(object sender, EventArgs e)
+        {
+            var dialog = new System.Windows.Forms.FolderBrowserDialog();
+            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                GetFiles(dialog.SelectedPath);
+
+                Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+
+                config.AppSettings.Settings["customFolder"].Value = dialog.SelectedPath;
+                config.Save(ConfigurationSaveMode.Modified);
+                ConfigurationManager.RefreshSection(config.AppSettings.SectionInformation.Name);
+            }
         }
 
         public void FilterAndSort(string text)

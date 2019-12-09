@@ -6,7 +6,7 @@
         xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
         xmlns:local="clr-namespace:rowin"
         mc:Ignorable="d"
-        Title="MainWindow" WindowStyle="None" WindowStartupLocation="CenterScreen" AllowsTransparency="True" Background="Transparent" Loaded="Window_Loaded" PreviewKeyDown="Window_PreviewKeyDown">
+        Title="MainWindow" WindowStyle="None" WindowStartupLocation="CenterScreen" AllowsTransparency="True" Background="Transparent" PreviewKeyDown="Window_PreviewKeyDown" Visibility="Hidden">
 
     <Window.Resources>
         <Style TargetType="TextBox">
