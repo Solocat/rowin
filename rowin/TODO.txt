@@ -1,5 +1,5 @@
 run on system startup
-force window on top (and steal focus?)
+steal focus?
 start .lnk as admin
 show in taskbar or not?
 

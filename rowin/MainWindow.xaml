@@ -6,7 +6,7 @@
         xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
         xmlns:local="clr-namespace:rowin"
         mc:Ignorable="d"
-        Title="MainWindow" WindowStyle="None" WindowStartupLocation="Manual" Width="0" Height="0" Left="4000" Top="4000" ShowInTaskbar="False" Topmost="True" AllowsTransparency="True" Background="Transparent" PreviewKeyDown="Window_PreviewKeyDown" Loaded="Window_Loaded" Closed="Window_Closed" >
+        Title="MainWindow" WindowStyle="None" WindowStartupLocation="Manual" Width="0" Height="0" Left="4000" Top="4000" ShowInTaskbar="False" Topmost="True" AllowsTransparency="True" Background="Transparent" PreviewKeyDown="Window_PreviewKeyDown" MouseEnter="Window_MouseEnter" Loaded="Window_Loaded" Closed="Window_Closed"  >
 
     <Window.Resources>
         <Style TargetType="TextBox">

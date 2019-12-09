@@ -176,6 +176,7 @@ namespace rowin
             AppContainer.SelectedIndex = -1;
 
             this.Show();
+            this.Activate();
         }
 
 
@@ -230,6 +231,7 @@ namespace rowin
                 case System.Windows.Input.Key.Up: FocusApps(); break;
                 case System.Windows.Input.Key.Left: FocusApps(); break;
                 case System.Windows.Input.Key.Right: FocusApps(); break;
+                case System.Windows.Input.Key.Tab: FocusApps(); break;
                 default: InputBox.Focus(); break;
             }
         }
@@ -290,6 +292,12 @@ namespace rowin
             _source.RemoveHook(HwndHook);
             _source = null;
             UnregisterHotKey(new WindowInteropHelper(this).Handle, HOTKEY_ID);
+        }
+
+        private void Window_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            this.Activate();
+            InputBox.Focus();
         }
     }
 }
