@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -16,6 +15,11 @@ namespace rowin
 {
     public class AppItem : INotifyPropertyChanged
     {
+        public AppItem()
+        {
+            Inlines = new ObservableCollection<Inline>();
+        }
+
         private BitmapSource ExtractIconFromFile(string file)
         {
             var sysicon = System.Drawing.Icon.ExtractAssociatedIcon(file);
@@ -57,9 +61,14 @@ namespace rowin
         //like: V isual S tudio C ode or Micro soft Edge
         public List<string> TextFragments { get; set; }
 
-        public List<bool> BoldCharacters { get; set; }
+        public string BoldText { get { return _BoldText; } set { _BoldText = value; OnPropertyChanged("BoldText"); } }
+        private string _BoldText { get; set; }
 
         public TextBlock Text { get; set; }
+
+        public string CapsyName { get; set; }
+
+        public ObservableCollection<Inline> Inlines { get; set; }
 
         public BitmapSource Icon { get {
                 if (_Icon == null) _Icon = ExtractIconFromFile(FilePath);
@@ -115,10 +124,51 @@ namespace rowin
                     TextFragments.Add(Name.Substring(CharsBeforeToken, text.Length));
                     TextFragments.Add(Name.Substring(CharsBeforeToken + text.Length));
 
-                    Text = new TextBlock();
-                    Text.Inlines.Add(new Run(Name.Substring(0, CharsBeforeToken)));
-                    Text.Inlines.Add(new Bold(new Run(Name.Substring(CharsBeforeToken, text.Length))));
-                    Text.Inlines.Add(new Run(Name.Substring(CharsBeforeToken + text.Length)));
+
+                    Inlines.Clear();
+                    Inlines = new ObservableCollection<Inline>();
+
+                    if (CharsBeforeToken > 0) Inlines.Add(new Run(Name.Substring(0, CharsBeforeToken)));
+                    if (text.Length > 0) Inlines.Add(new Bold(new Run(Name.Substring(CharsBeforeToken, text.Length))));
+                    if (Name.Length > CharsBeforeToken + text.Length) Inlines.Add(new Run(Name.Substring(CharsBeforeToken + text.Length)));
+
+
+                    OnPropertyChanged("Inlines");
+
+                    BoldText = "";
+                    for (int i = 0; i < CharsBeforeToken; i++)
+                    {
+                        //\xA0
+                        BoldText += Name.ElementAt(i) == ' ' ? ' ' : '\u0E4B';
+                        //BoldText += Name.ElementAt(i);
+                    }
+                    
+                    for (int i = 0; i < Token.Length; i++)
+                    {
+                        //BoldText += Token.ElementAt(i);
+                        BoldText += '_';
+                    }
+
+                    for (int i = CharsBeforeToken + text.Length; i < Name.Length; i++)
+                    {
+                        //BoldText += Name.ElementAt(i);
+                        BoldText += Name.ElementAt(i) == ' ' ? ' ' : '\u0E4B';
+                    }
+
+
+                    CapsyName = Name;
+
+                    for (int i = CharsBeforeToken; i < text.Length; i++)
+                    {
+                        var toke = Name.Substring(CharsBeforeToken, text.Length);
+                        Trace.WriteLine(toke);
+                        //CapsyName.Replace(toke, toke.ToUpperInvariant());
+                        CapsyName = CapsyName.Replace(toke, toke.ToUpperInvariant());
+                        //CapsyName = toke.ToUpperInvariant();
+                    }
+
+                    
+                    OnPropertyChanged("CapsyName");
                 }
             }
 

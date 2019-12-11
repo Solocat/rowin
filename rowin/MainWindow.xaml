@@ -67,16 +67,23 @@
                 </ListBox.ItemsPanel>
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <DockPanel Margin="12 0">
+                        <DockPanel Margin="12 0" ToolTip="{Binding Name}">
                             <Image Source="{Binding Icon}" Stretch="None" DockPanel.Dock="Left" Margin="0 0 12 0"/>
-                            <TextBlock Foreground="White" FontSize="18" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" VerticalAlignment="Center">
-                                <TextBlock.Inlines>
-                                    <Run Text="{Binding Path=TextBeforeToken, Mode=OneWay}" /><!--
-                                 --><Run FontWeight="Bold" Text="{Binding Token}" /><!--
-                                 --><Run Text="{Binding TextAfterToken}"/>
-                                </TextBlock.Inlines>
-                            </TextBlock>
 
+
+                            <!--<local:FormattedTextBlock Text="{Binding TextBeforeToken}" Inlines="{Binding Inlines, UpdateSourceTrigger=PropertyChanged}">
+
+                            </local:FormattedTextBlock>-->
+
+                            <!--<Grid>
+                                <TextBlock Foreground="White" FontSize="18" FontFamily="Consolas" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Text="{Binding Name}"/>
+                                <TextBlock Foreground="White" FontWeight="Bold" FontSize="18" FontFamily="Consolas" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Text="{Binding BoldText}"/>
+                            </Grid>-->
+                            <!--<TextBlock Foreground="White" FontSize="18" FontFamily="Consolas" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Text="{Binding CapsyName}"/>-->
+
+                            <local:BindableTextBlock Foreground="White" FontSize="18" TextWrapping="WrapWithOverflow" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" InlineList="{Binding Inlines}">
+                            </local:BindableTextBlock>
+                            
                             <DockPanel.ContextMenu>
                                 <ContextMenu>
                                     <MenuItem Name="AdminStart" Header="Start as Admin" Click="AdminStart_Click"/>
