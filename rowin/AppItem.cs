@@ -44,10 +44,19 @@ namespace rowin
             }
         }
 
+        public List<int> WordIndices { get {
+                var inx = new List<int>();
+                foreach (var w in Words) {
+                    inx.Add(Name.IndexOf(w));
+                }
+                return inx;
+            }
+        }
+
         public List<char> Acronym { get {
                 var list = new List<char>();
                 foreach (var w in Words) {
-                    if (!String.IsNullOrEmpty(w)) list.Add(w.ToCharArray()[0]);
+                    if (!String.IsNullOrEmpty(w)) list.Add(w.First());
                 }
                 return list;
             } 
@@ -61,12 +70,6 @@ namespace rowin
         //like: V isual S tudio C ode or Micro soft Edge
         public List<string> TextFragments { get; set; }
 
-        public string BoldText { get { return _BoldText; } set { _BoldText = value; OnPropertyChanged("BoldText"); } }
-        private string _BoldText { get; set; }
-
-        public TextBlock Text { get; set; }
-
-        public string CapsyName { get; set; }
 
         public ObservableCollection<Inline> Inlines { get; set; }
 
@@ -87,9 +90,7 @@ namespace rowin
             bool shorthand = false;
             if (text.Length > 1)
             {
-                
-                
-
+                Inlines = new ObservableCollection<Inline>();
 
                 shorthand = true;
                 var chars = text.ToCharArray();
@@ -104,11 +105,25 @@ namespace rowin
 
                     TextFragments.Add(chars[i].ToString());
                     TextFragments.Add(Words[i].Substring(1, Words[i].Length - 1));
+
+                    //string remaining = Words[i].Substring(1, Words[i].Length - 1);
+
+                    string remaining;
+                    if (i + 1 >= WordIndices.Count) remaining = Name.Substring(WordIndices[i] + 1);
+                    else {
+                        Trace.WriteLine(WordIndices[i + 1]);
+                        remaining = Name.Substring(WordIndices[i] + 1, WordIndices[i + 1] - WordIndices[i] - 1); 
+                    }
+
+                    Inlines.Add(new Bold(new Run(Acronym[i].ToString())));
+                    if (!string.IsNullOrEmpty(remaining))Inlines.Add(new Run(remaining));
                 }
+
+                OnPropertyChanged("Inlines");
             }
             if (shorthand)
             {
-                
+
             }
 
             if (!shorthand)
@@ -117,15 +132,6 @@ namespace rowin
 
                 if (CharsBeforeToken != -1)
                 {
-                    TextAfterToken = Name.Substring(CharsBeforeToken + text.Length);
-                    Token = Name.Substring(CharsBeforeToken, text.Length);
-
-                    TextFragments.Add(Name.Substring(0, CharsBeforeToken));
-                    TextFragments.Add(Name.Substring(CharsBeforeToken, text.Length));
-                    TextFragments.Add(Name.Substring(CharsBeforeToken + text.Length));
-
-
-                    Inlines.Clear();
                     Inlines = new ObservableCollection<Inline>();
 
                     if (CharsBeforeToken > 0) Inlines.Add(new Run(Name.Substring(0, CharsBeforeToken)));
@@ -135,63 +141,15 @@ namespace rowin
 
                     OnPropertyChanged("Inlines");
 
-                    BoldText = "";
-                    for (int i = 0; i < CharsBeforeToken; i++)
-                    {
-                        //\xA0
-                        BoldText += Name.ElementAt(i) == ' ' ? ' ' : '\u0E4B';
-                        //BoldText += Name.ElementAt(i);
-                    }
-                    
-                    for (int i = 0; i < Token.Length; i++)
-                    {
-                        //BoldText += Token.ElementAt(i);
-                        BoldText += '_';
-                    }
-
-                    for (int i = CharsBeforeToken + text.Length; i < Name.Length; i++)
-                    {
-                        //BoldText += Name.ElementAt(i);
-                        BoldText += Name.ElementAt(i) == ' ' ? ' ' : '\u0E4B';
-                    }
-
-
-                    CapsyName = Name;
-
-                    for (int i = CharsBeforeToken; i < text.Length; i++)
-                    {
-                        var toke = Name.Substring(CharsBeforeToken, text.Length);
-                        Trace.WriteLine(toke);
-                        //CapsyName.Replace(toke, toke.ToUpperInvariant());
-                        CapsyName = CapsyName.Replace(toke, toke.ToUpperInvariant());
-                        //CapsyName = toke.ToUpperInvariant();
-                    }
-
-                    
-                    OnPropertyChanged("CapsyName");
+                  
                 }
             }
-
-            foreach (var f in TextFragments)
-            {
-                //Trace.WriteLine(f);
-            }
-
-            OnPropertyChanged("TextBeforeToken");
-            OnPropertyChanged("Token");
-            OnPropertyChanged("TextAfterToken");
 
             return CharsBeforeToken;
         }
         public int CharsBeforeToken { get { return _CharsBeforeToken; } set { _CharsBeforeToken = value; OnPropertyChanged("IsVisible"); } }
 
         private int _CharsBeforeToken { get; set; }
-
-        public string TextBeforeToken { get { return CharsBeforeToken != -1 ? Name.Substring(0, CharsBeforeToken) : Name; } }
-
-
-        public string Token { get; set; }
-        public string TextAfterToken { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
