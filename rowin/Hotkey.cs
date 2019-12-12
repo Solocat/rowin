@@ -26,5 +26,19 @@ namespace rowin
             }
             return IntPtr.Zero;
         }
+
+        private void HookHotkey()
+        {
+            _source = HwndSource.FromHwnd(Handle);
+            _source.AddHook(HwndHook);
+            RegisterHotKey(Handle, HOTKEY_ID, 0x001, 0x20);
+        }
+
+        private void UnHookHotkey()
+        {
+            _source.RemoveHook(HwndHook);
+            _source = null;
+            UnregisterHotKey(new WindowInteropHelper(this).EnsureHandle(), HOTKEY_ID);
+        }
     }
 }

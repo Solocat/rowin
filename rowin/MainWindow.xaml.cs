@@ -16,6 +16,8 @@ namespace rowin
     /// </summary>
     public partial class MainWindow : Window
     {
+        private IntPtr Handle { get; set; }
+
         public ObservableCollection<AppItem> AppList { get; set; }
 
         public ICollectionView AppListView { get; private set; }
@@ -61,16 +63,11 @@ namespace rowin
             };
             TrayIcon.DoubleClick += delegate (object sender, EventArgs args) { FromTray(); };
 
-            //GetFiles(ConfigurationManager.AppSettings["customFolder"]);
             GetFiles(Properties.Settings.Default.customFolder);
 
-            //hook hotkey
-            var handle = new WindowInteropHelper(this).EnsureHandle();
-            _source = HwndSource.FromHwnd(handle);
-            _source.AddHook(HwndHook);
-            RegisterHotKey(handle, HOTKEY_ID, 0x001, 0x20);
-
-            AcrylicBlur.EnableBlur(0x64, 0, handle);
+            Handle = new WindowInteropHelper(this).EnsureHandle();
+            HookHotkey();
+            AcrylicBlur.EnableBlur(0x64, 0, Handle);
         }
 
         private void GetFiles(string path)
@@ -221,9 +218,7 @@ namespace rowin
             TrayIcon.Icon.Dispose();
             TrayIcon.Dispose();
 
-            _source.RemoveHook(HwndHook);
-            _source = null;
-            UnregisterHotKey(new WindowInteropHelper(this).Handle, HOTKEY_ID);
+            UnHookHotkey();
         }
 
         private void Window_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
