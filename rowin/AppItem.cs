@@ -6,7 +6,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
@@ -67,10 +66,6 @@ namespace rowin
             return null;
         }
 
-        //like: V isual S tudio C ode or Micro soft Edge
-        public List<string> TextFragments { get; set; }
-
-
         public ObservableCollection<Inline> Inlines { get; set; }
 
         public BitmapSource Icon { get {
@@ -85,7 +80,6 @@ namespace rowin
         public int GiveOrder(string text)
         {
             CharsBeforeToken = 0;
-            TextFragments = new List<string>();
 
             bool shorthand = false;
             if (text.Length > 1)
@@ -103,11 +97,6 @@ namespace rowin
                         break;
                     }
 
-                    TextFragments.Add(chars[i].ToString());
-                    TextFragments.Add(Words[i].Substring(1, Words[i].Length - 1));
-
-                    //string remaining = Words[i].Substring(1, Words[i].Length - 1);
-
                     string remaining;
                     if (i + 1 >= WordIndices.Count) remaining = Name.Substring(WordIndices[i] + 1);
                     else {
@@ -120,10 +109,6 @@ namespace rowin
                 }
 
                 OnPropertyChanged("Inlines");
-            }
-            if (shorthand)
-            {
-
             }
 
             if (!shorthand)

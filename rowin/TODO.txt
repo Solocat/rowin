@@ -4,7 +4,7 @@ start .lnk as admin
 show in taskbar or not?
 
 Deep Rock: divide name into words by spaces,dashes, capitals etc.
-verylongwords aren't centered: happens when first run is empty?
+move hotkey to its own file
 
 live shaping?
 focus two elements at the same time?

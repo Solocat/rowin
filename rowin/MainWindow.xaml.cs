@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Runtime.InteropServices;
-using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Interop;
 using System.IO;
 using System.Diagnostics;
 using System.Collections.ObjectModel;
-using System.Windows.Media.Imaging;
 using System.Linq;
 using System.ComponentModel;
 using System.Windows.Data;
 using System.Windows.Controls;
-using System.Configuration;
 
 namespace rowin
 {
@@ -20,27 +16,6 @@ namespace rowin
     /// </summary>
     public partial class MainWindow : Window
     {
-        
-        [DllImport("User32.dll")]
-        private static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
-
-        [DllImport("User32.dll")]
-        private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
-
-        private HwndSource _source;
-        private const int HOTKEY_ID = 9001;
-
-        private IntPtr HwndHook(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
-        {
-            if (msg == 0x0312 && wParam.ToInt32() == HOTKEY_ID)
-            {
-                if (this.Visibility == Visibility.Visible) ToTray();
-                else FromTray();
-                handled = true;
-            }
-            return IntPtr.Zero;
-        }
-
         public ObservableCollection<AppItem> AppList { get; set; }
 
         public ICollectionView AppListView { get; private set; }
@@ -153,7 +128,6 @@ namespace rowin
             this.Activate();
         }
 
-
         private void ToTray()
         {
             this.Hide();
@@ -164,7 +138,6 @@ namespace rowin
             if (AppContainer.SelectedItem != null)
             {
                 Process.Start((AppContainer.SelectedItem as AppItem).FilePath);
-                //Application.Current.Shutdown();
                 ToTray();
             }
         }
@@ -210,24 +183,10 @@ namespace rowin
             }
         }
 
-        private void InputBox_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
-        {
-            // Prohibit non-alphabetic
-
-            /*Regex r = new Regex(@"^[a-zA-Z]+$");
-
-            return r.IsMatch(s);
-
-            if (!IsAlphabetic(e.Text))
-                e.Handled = true;*/
-            //Trace.WriteLine("input");
-        }
-
         private void AdminStart_Click(object sender, RoutedEventArgs e)
         {
             if (AppContainer.SelectedItem != null)
             {
-
                 var info = new ProcessStartInfo
                 {
                     FileName = (AppContainer.SelectedItem as AppItem).FilePath,
@@ -255,7 +214,6 @@ namespace rowin
             this.Top = (SystemParameters.PrimaryScreenHeight / 2) - (this.Height / 2);
 
             this.Hide();
-
         }
 
         private void Window_Closed(object sender, EventArgs e)

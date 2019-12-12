@@ -6,7 +6,21 @@
         xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
         xmlns:local="clr-namespace:rowin"
         mc:Ignorable="d"
-        Title="MainWindow" WindowStyle="None" WindowStartupLocation="Manual" Width="0" Height="0" Left="4000" Top="4000" ShowInTaskbar="False" Topmost="True" AllowsTransparency="True" Background="Transparent" PreviewKeyDown="Window_PreviewKeyDown" MouseEnter="Window_MouseEnter" Loaded="Window_Loaded" Closed="Window_Closed"  >
+        Title="MainWindow" WindowStartupLocation="Manual" PreviewKeyDown="Window_PreviewKeyDown" MouseEnter="Window_MouseEnter" Loaded="Window_Loaded" Closed="Window_Closed">
+
+    <Window.Style>
+        <Style TargetType="{x:Type Window}">
+            <Setter Property="WindowStyle" Value="None" />
+            <Setter Property="Width" Value="0" />
+            <Setter Property="Height" Value="0" />
+            <Setter Property="Left" Value="4000" />
+            <Setter Property="Top" Value="4000" />
+            <Setter Property="ShowInTaskbar" Value="False" />
+            <Setter Property="Topmost" Value="True" />
+            <Setter Property="AllowsTransparency" Value="True" />
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+    </Window.Style>
 
     <Window.Resources>
         <Style TargetType="TextBox">
@@ -50,14 +64,21 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <Style x:Key="AppText" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="TextWrapping" Value="WrapWithOverflow" />
+            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
     </Window.Resources>
 
     <Grid>
         <Border BorderThickness="0" Background="#01000000" /> <!--Scrim to prevent interacting with background. must have some opacity-->
 
-        <StackPanel  Width="800" VerticalAlignment="Center">
-            <TextBox Name="InputBox" Text="{Binding Path=InputText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                     PreviewTextInput="InputBox_PreviewTextInput"/>
+        <StackPanel Width="800" VerticalAlignment="Center">
+            <TextBox Name="InputBox" Text="{Binding Path=InputText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
 
             <ListBox Name="AppContainer" ItemsSource="{Binding AppListLive}" ItemContainerStyle="{StaticResource AppItem}" MouseDoubleClick="AppContainer_MouseDoubleClick">
                 <ListBox.ItemsPanel>
@@ -69,10 +90,10 @@
                     <DataTemplate>
                         <DockPanel Margin="12 0" ToolTip="{Binding Name}">
                             <Image Source="{Binding Icon}" Stretch="None" DockPanel.Dock="Left" Margin="0 0 12 0"/>
-                            
-                            <local:BindableTextBlock Foreground="White" FontSize="18" TextWrapping="WrapWithOverflow" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" InlineList="{Binding Inlines}">
+
+                            <local:BindableTextBlock Style="{StaticResource AppText}" InlineList="{Binding Inlines}">
                             </local:BindableTextBlock>
-                            
+
                             <DockPanel.ContextMenu>
                                 <ContextMenu>
                                     <MenuItem Name="AdminStart" Header="Start as Admin" Click="AdminStart_Click"/>
@@ -81,7 +102,6 @@
                         </DockPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
-
             </ListBox>
         </StackPanel>
     </Grid>
