@@ -54,9 +54,10 @@ namespace rowin
             var menu = new System.Windows.Forms.ContextMenu();
             menu.MenuItems.Add("Close", (s, e) => this.Close());
             menu.MenuItems.Add("Set custom folder", SetCustomFolder);
+
             TrayIcon = new System.Windows.Forms.NotifyIcon
             {
-                Icon = new System.Drawing.Icon("rowin.ico"),
+                Icon = Properties.Resources.rowin,
                 Visible = true,
                 Text = "Rowin",
                 ContextMenu = menu
