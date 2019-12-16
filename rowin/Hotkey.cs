@@ -38,7 +38,7 @@ namespace rowin
         {
             _source.RemoveHook(HwndHook);
             _source = null;
-            UnregisterHotKey(new WindowInteropHelper(this).EnsureHandle(), HOTKEY_ID);
+            UnregisterHotKey(Handle, HOTKEY_ID);
         }
     }
 }

@@ -112,7 +112,13 @@ namespace rowin
             {
                 app.GiveOrder(text);
             }
-            //AppListView.Refresh();
+
+            AppListView.Refresh();
+
+            if (AppContainer.Items.Count > 0 && !String.IsNullOrEmpty(text))
+            {
+                AppContainer.SelectedIndex = 0;
+            }
         }
 
         public void FromTray()
